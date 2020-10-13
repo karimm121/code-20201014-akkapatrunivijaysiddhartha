@@ -1,4 +1,3 @@
-
 def get_data(data):
 	if not isinstance(data,list):
 		print(f"unhandled data format")
@@ -21,10 +20,10 @@ def get_bmi_data(chart):
 	except ModuleNotFoundError as module_error:
 		print("pandas has to be installed to run this file")
 		return
-		
-	bmi_chart_data = pd.read_csv(chart)
-	bmi_data ={}
-	BMICategory,bmi_range,health_risk=bmi_chart_data['BMICategory'],\
+	else:
+		bmi_chart_data = pd.read_csv(chart)
+		bmi_data ={}
+		BMICategory,bmi_range,health_risk=bmi_chart_data['BMICategory'],\
 					  bmi_chart_data['BMIRange(kg/m2)'],\
 					  bmi_chart_data['HealthRisk']
 	
@@ -35,9 +34,15 @@ def get_bmi_data(chart):
 			bmi_data["ranges"][ranges[iteration]] = [categories[iteration],risks[iteration]]
 	bmi_range_keys=bmi_data["ranges"].keys()
 	bmis = get_data(DATA)
-	#for bmi in bmis:print(bmi)
 	overweight = 0
 	BMICategory=BMIRange=HealthRisk=""
+
+	def get_details():
+		BMICategory = bmi_data["ranges"][bmi_range_key][0]
+		BMIRange = bmi_range_key
+		HealthRisk = bmi_data["ranges"][bmi_range_key][1]
+		return BMICategory,BMIRange,HealthRisk
+		
 	for bmi in bmis.keys():
 		for bmi_range_key in bmi_range_keys:	
 			if "-" in bmi_range_key and bmi_data["ranges"][bmi_range_key][0] == "Overweight" :
@@ -47,26 +52,15 @@ def get_bmi_data(chart):
 			if "-" in bmi_range_key:
 				lower_limit,upper_limit = bmi_range_key.split('-')
 				if bmis[bmi] >= float(lower_limit)  and bmis[bmi] <= float(upper_limit):
-					#print(f"{bmi} {bmi_data['ranges'][bmi_range_key]}")
-					BMICategory = bmi_data["ranges"][bmi_range_key][0]
-					BMIRange = bmi_range_key
-					HealthRisk = bmi_data["ranges"][bmi_range_key][1]
+					BMICategory,BMIRange,HealthRisk=get_details()
 			elif "below" in bmi_range_key:
 				if bmis[bmi] <= float(bmi_range_key.split("and")[0]):
-					BMICategory = bmi_data["ranges"][bmi_range_key][0]
-					BMIRange = bmi_range_key
-					HealthRisk = bmi_data["ranges"][bmi_range_key][1]
-					#print(f"{bmi} {bmi_data['ranges'][bmi_range_key]}")
+					BMICategory,BMIRange,HealthRisk=get_details()
 			elif "above" in bmi_range_key:
 				if bmis[bmi] >= float(bmi_range_key.split("and")[0]):
-					BMICategory = bmi_data["ranges"][bmi_range_key][0]
-					BMIRange = bmi_range_key
-					HealthRisk = bmi_data["ranges"][bmi_range_key][1]
-					#print(f"{bmi} {bmi_data['ranges'][bmi_range_key]}")
-
-		DATA[bmi]["BMICategory"] = BMICategory
-		DATA[bmi]["BMIRange"] = BMIRange
-		DATA[bmi]["HealthRisk"] = HealthRisk 
+					BMICategory,BMIRange,HealthRisk=get_details()
+		data = DATA[bmi]
+		data["BMICategory"],data["BMIRange"],data["HealthRisk"] = BMICategory , BMIRange, HealthRisk
 		
 	print(f"overweight people are {overweight}")
 	return DATA
@@ -85,4 +79,3 @@ else:
 	DATA=get_bmi_data(chart)
 	for data in DATA:
 		print(data)
-
