@@ -9,7 +9,7 @@ def get_data_validations(data):
 	return True
 
 
-def get_data(data):
+def get_data(data=None):
 	if not get_data_validations(data):
 		return False
 	bmis = {}
@@ -24,7 +24,14 @@ def get_data(data):
 		index += 1
 	return bmis
 
-def get_bmi_data(chart):
+def get_bmi_data_validations(chart):
+	if chart == None:
+		return False
+	return True
+
+def get_bmi_data(chart=None):
+	if not get_bmi_data_validations(chart):
+		return False
 	try:
 		import pandas as pd
 	except ModuleNotFoundError as module_error:
@@ -48,28 +55,38 @@ def get_bmi_data(chart):
 	BMICategory=BMIRange=HealthRisk=""
 
 	def get_details():
+
 		BMICategory = bmi_data["ranges"][bmi_range_key][0]
 		BMIRange = bmi_range_key
 		HealthRisk = bmi_data["ranges"][bmi_range_key][1]
 		return BMICategory,BMIRange,HealthRisk
+
+
 	for bmi in bmis.keys():
+
 		for bmi_range_key in bmi_range_keys:	
+
 			if "-" in bmi_range_key and bmi_data["ranges"][bmi_range_key][0] == "Overweight" :
 				lower_limit,upper_limit = bmi_range_key.split('-')
 				if bmis[bmi] >= float(lower_limit)  and bmis[bmi] <= float(upper_limit):
 					overweight += 1
+
 			if "-" in bmi_range_key:
 				lower_limit,upper_limit = bmi_range_key.split('-')
 				if bmis[bmi] >= float(lower_limit)  and bmis[bmi] <= float(upper_limit):
-					BMICategory,BMIRange,HealthRisk=get_details()
+					BMICategory,BMIRange,HealthRisk = get_details()
+
 			elif "below" in bmi_range_key:
 				if bmis[bmi] <= float(bmi_range_key.split("and")[0]):
-					BMICategory,BMIRange,HealthRisk=get_details()
+					BMICategory,BMIRange,HealthRisk = get_details()
+
 			elif "above" in bmi_range_key:
 				if bmis[bmi] >= float(bmi_range_key.split("and")[0]):
-					BMICategory,BMIRange,HealthRisk=get_details()
+					BMICategory,BMIRange,HealthRisk = get_details()
+
 		data = DATA[bmi]
 		data["BMICategory"],data["BMIRange"],data["HealthRisk"] = BMICategory , BMIRange, HealthRisk
+
 	return DATA, overweight
 
 DATA=[{"Gender": "Male", "HeightCm": 171, "WeightKg": 96 },\
@@ -81,9 +98,11 @@ DATA=[{"Gender": "Male", "HeightCm": 171, "WeightKg": 96 },\
 
 chart='BMI-CHART.csv'
 if __name__ == "__main__":
+
 	import os
 	if not os.path.isfile(chart):
 		print(f"{chart} file for BMI Category is not found")
+
 	else:
 		DATA,overweights = get_bmi_data(chart)
 		for data in DATA:
