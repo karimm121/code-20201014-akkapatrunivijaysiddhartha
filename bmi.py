@@ -1,7 +1,17 @@
-def get_data(data):
+
+def get_data_validations(data):
 	if not isinstance(data,list):
 		print(f"unhandled data format")
-		return
+		return False 
+	if not isinstance(data[0],dict):
+		print(f"unhandled data format")
+		return False 
+	return True
+
+
+def get_data(data):
+	if not get_data_validations(data):
+		return False
 	bmis = {}
 	index = 0
 	for individual_details in data:
@@ -42,7 +52,6 @@ def get_bmi_data(chart):
 		BMIRange = bmi_range_key
 		HealthRisk = bmi_data["ranges"][bmi_range_key][1]
 		return BMICategory,BMIRange,HealthRisk
-		
 	for bmi in bmis.keys():
 		for bmi_range_key in bmi_range_keys:	
 			if "-" in bmi_range_key and bmi_data["ranges"][bmi_range_key][0] == "Overweight" :
@@ -72,10 +81,11 @@ DATA=[{"Gender": "Male", "HeightCm": 171, "WeightKg": 96 },\
  {"Gender": "Female", "HeightCm": 167, "WeightKg": 82}]
 
 chart='BMI-CHART.csv'
-import os
-if not os.path.isfile(chart):
-	print(f"{chart} file for BMI Category is not found")
-else:
-	DATA=get_bmi_data(chart)
-	for data in DATA:
-		print(data)
+if __name__ == "__main__":
+	import os
+	if not os.path.isfile(chart):
+		print(f"{chart} file for BMI Category is not found")
+	else:
+		DATA=get_bmi_data(chart)
+		for data in DATA:
+			print(data)
