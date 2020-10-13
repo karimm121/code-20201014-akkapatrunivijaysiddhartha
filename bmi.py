@@ -70,9 +70,8 @@ def get_bmi_data(chart):
 					BMICategory,BMIRange,HealthRisk=get_details()
 		data = DATA[bmi]
 		data["BMICategory"],data["BMIRange"],data["HealthRisk"] = BMICategory , BMIRange, HealthRisk
-		
-	print(f"overweight people are {overweight}")
-	return DATA
+	return DATA, overweight
+
 DATA=[{"Gender": "Male", "HeightCm": 171, "WeightKg": 96 },\
  { "Gender": "Male", "HeightCm": 161, "WeightKg": 85 },\
  { "Gender": "Male", "HeightCm": 180, "WeightKg": 77 },\
@@ -86,6 +85,7 @@ if __name__ == "__main__":
 	if not os.path.isfile(chart):
 		print(f"{chart} file for BMI Category is not found")
 	else:
-		DATA=get_bmi_data(chart)
+		DATA,overweights = get_bmi_data(chart)
 		for data in DATA:
 			print(data)
+		print(f"overweights count: {overweights}")
